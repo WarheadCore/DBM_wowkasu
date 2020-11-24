@@ -38,7 +38,7 @@
 --
 --
 
-local revision =("$Revision: 4379 $"):sub(12, -3) 
+local revision =("$Revision: 5000 $"):sub(12, -3) 
 local FrameTitle = "DBM_GUI_Option_"	-- all GUI frames get automatically a name FrameTitle..ID
 
 local PanelPrototype = {}
@@ -1829,8 +1829,8 @@ local function CreateOptionsMenu()
 	end
 
 	-- Set Revision // please don't translate this!
-	DBM_GUI_OptionsFrameRevision:SetText("Version: "..DBM.DisplayVersion.." - Core: r"..DBM.Revision.." - Gui: r"..revision)
-	DBM_GUI_OptionsFrameTranslation:SetText("Translated by: "..L.TranslationBy)
+	DBM_GUI_OptionsFrameRevision:SetText("Версия: "..DBM.DisplayVersion.." - Ядро: r"..DBM.Revision.." - Интерфейс: r"..revision)
+	DBM_GUI_OptionsFrameTranslation:SetText("Переведено: "..L.TranslationBy)
 end
 DBM:RegisterOnGuiLoadCallback(CreateOptionsMenu, 1)
 
