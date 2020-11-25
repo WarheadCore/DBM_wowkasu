@@ -11,20 +11,20 @@ mod:EnableModel()
 
 mod:RegisterEvents(
 	"SPELL_CAST_START",
-	"CHAT_MSG_RAID_BOSS_EMOTE",
+	"CHAT_MSG_MONSTER_YELL",
 	"UNIT_AURA"
 )
 
 local warnShiftCasting		= mod:NewCastAnnounce(28089, 3)
 local warnChargeChanged		= mod:NewSpecialWarning("WarningChargeChanged")
 local warnChargeNotChanged	= mod:NewSpecialWarning("WarningChargeNotChanged", false)
-local warnThrow				= mod:NewSpellAnnounce(28338, 2)
-local warnThrowSoon			= mod:NewSoonAnnounce(28338, 1)
+local warnThrow				= mod:NewSpellAnnounce(28337, 2)
+local warnThrowSoon			= mod:NewSoonAnnounce(28337, 1)
 
-local enrageTimer			= mod:NewBerserkTimer(365)
+local enrageTimer			= mod:NewBerserkTimer(360)
 local timerNextShift		= mod:NewNextTimer(30, 28089)
 local timerShiftCast		= mod:NewCastTimer(3, 28089)
-local timerThrow			= mod:NewNextTimer(20.6, 28338)
+local timerThrow			= mod:NewCDTimer(25, 28337)
 
 mod:AddBoolOption("ArrowsEnabled", false, "Arrows")
 mod:AddBoolOption("ArrowsRightLeft", false, "Arrows")
@@ -38,15 +38,13 @@ mod:SetBossHealthInfo(
 
 local currentCharge
 local phase2
-local down = 0
 
 function mod:OnCombatStart(delay)
 	phase2 = false
 	currentCharge = nil
-	down = 0
-	self:ScheduleMethod(20.6 - delay, "TankThrow")
-	timerThrow:Start(-delay)
-	warnThrowSoon:Schedule(17.6 - delay)
+	self:ScheduleMethod(25 - delay, "TankThrow")
+	timerThrow:Start(25 - delay)
+	warnThrowSoon:Schedule(20 - delay)
 end
 
 local lastShift = 0
@@ -102,16 +100,14 @@ function mod:UNIT_AURA(elapsed)
 	end
 end
 
-function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
-	if msg == L.Emote or msg == L.Emote2 then
-		down = down + 1
-		if down >= 2 then
-			self:UnscheduleMethod("TankThrow")
-			timerThrow:Cancel()
-			warnThrowSoon:Cancel()
-			DBM.BossHealth:Hide()
-			enrageTimer:Start()
-		end
+function mod:CHAT_MSG_MONSTER_YELL(msg)
+	if msg == L.AggroYell1 or msg == L.AggroYell2 or msg == L.AggroYell3 then
+		self:UnscheduleMethod("TankThrow")
+		timerThrow:Cancel()
+		warnThrowSoon:Cancel()
+		DBM.BossHealth:Hide()
+		enrageTimer:Start()
+		timerNextShift:Start()
 	end
 end
 
@@ -120,9 +116,9 @@ function mod:TankThrow()
 		DBM.BossHealth:Hide()
 		return
 	end
-	timerThrow:Start()
-	warnThrowSoon:Schedule(17.6)
-	self:ScheduleMethod(20.6, "TankThrow")
+	timerThrow:Start(28)
+	warnThrowSoon:Schedule(25)
+	self:ScheduleMethod(28, "TankThrow")
 end
 
 local function arrowOnUpdate(self, elapsed)
