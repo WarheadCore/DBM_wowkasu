@@ -1,7 +1,7 @@
 local mod	= DBM:NewMod("Grobbulus", "DBM-Naxx", 2)
 local L		= mod:GetLocalizedStrings()
 
-mod:SetRevision(("$Revision: 4154 $"):sub(12, -3))
+mod:SetRevision(("$Revision: 4200 $"):sub(12, -3))
 mod:SetCreatureID(15931)
 mod:SetUsedIcons(5, 6, 7, 8)
 
@@ -22,7 +22,7 @@ local specWarnInjection	= mod:NewSpecialWarning("SpecialWarningInjection")
 
 local timerInjection	= mod:NewTargetTimer(10, 28169)
 local timerCloud		= mod:NewNextTimer(15, 28240)
-local enrageTimer		= mod:NewBerserkTimer(720)
+local enrageTimer		= mod:NewBerserkTimer(540)
 
 mod:AddBoolOption("SetIconOnInjectionTarget", true)
 
@@ -47,7 +47,12 @@ end
 
 function mod:OnCombatStart(delay)
 	table.wipe(mutateIcons)
-	enrageTimer:Start(-delay)
+
+	if mod:IsDifficulty("normal10") or mod:IsDifficulty("heroic10") then
+		enrageTimer:Start(720)
+	else
+		enrageTimer:Start(540 - delay)
+	end
 end
 
 function mod:OnCombatEnd()
