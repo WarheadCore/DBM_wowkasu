@@ -31,13 +31,13 @@ function mod:OnCombatStart(delay)
 end
 
 function mod:SPELL_CAST_START(args)
-	if args:IsSpellID(28785, 54021) then  -- Locust Swarm
+	if args:IsSpellID(28785, 54021) then -- Locust Swarm
 		warningLocustNow:Show()
 		specialWarningLocust:Show()
 		timerLocustIn:Stop()
 		
 		if mod:IsDifficulty("normal25") or mod:IsDifficulty("heroic25") then
-			timerLocustFade:Start(26)
+			timerLocustFade:Start(23)
 		else
 			timerLocustFade:Start(19)
 		end
@@ -47,8 +47,14 @@ end
 function mod:SPELL_AURA_REMOVED(args)
 	if args:IsSpellID(28785, 54021) and args.auraType == "BUFF" then
 		warningLocustFaded:Show()
-		timerLocustIn:Start()
-		warningLocustSoon:Schedule(85)
+		
+		if mod:IsDifficulty("normal25") or mod:IsDifficulty("heroic25") then
+			timerLocustIn:Start(67)
+			warningLocustSoon:Schedule(57)
+		else
+			timerLocustIn:Start(71)
+			warningLocustSoon:Schedule(61)
+		end
 	end
 end
 
