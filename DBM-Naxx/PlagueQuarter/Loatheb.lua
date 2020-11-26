@@ -20,10 +20,11 @@ local warnDoomNow	= mod:NewSpellAnnounce(29204, 3)
 local warnHealSoon	= mod:NewAnnounce("WarningHealSoon", 4, 48071)
 local warnHealNow	= mod:NewAnnounce("WarningHealNow", 1, 48071, false)
 
-
 local timerSpore	= mod:NewNextTimer(36, 32329)
 local timerDoom		= mod:NewNextTimer(180, 29204)
 local timerAura		= mod:NewBuffActiveTimer(17, 55593)
+
+local timerBerserk  = mod:NewBerserkTimer(720)
 
 mod:AddBoolOption("SporeDamageAlert", false)
 
@@ -32,14 +33,17 @@ local sporeTimer	= 36
 
 function mod:OnCombatStart(delay)
 	doomCounter = 0
-	if mod:IsDifficulty("heroic25") then
+	
+	if mod:IsDifficulty("normal25") or mod:IsDifficulty("heroic25") then
 		sporeTimer = 18
 	else
 		sporeTimer = 36
 	end
+	
 	timerSpore:Start(sporeTimer - delay)
 	warnSporeSoon:Schedule(sporeTimer - 5 - delay)
 	timerDoom:Start(120 - delay, doomCounter + 1)
+	timerBerserk:Start(720 - delay)
 end
 
 function mod:SPELL_CAST_SUCCESS(args)
