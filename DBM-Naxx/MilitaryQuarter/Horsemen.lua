@@ -16,6 +16,8 @@ mod:RegisterEvents(
 local warnMarkSoon			= mod:NewAnnounce("WarningMarkSoon", 1, 28835, false)
 local warnMarkNow			= mod:NewAnnounce("WarningMarkNow", 2, 28835)
 
+local timerBerserk  		= mod:NewBerserkTimer(1500)
+
 local specWarnMarkOnPlayer	= mod:NewSpecialWarning("SpecialWarningMarkOnPlayer", nil, false, true)
 
 mod:AddBoolOption("HealthFrame", true)
@@ -31,6 +33,7 @@ local markCounter = 0
 
 function mod:OnCombatStart(delay)
 	markCounter = 0
+	timerBerserk:Start(1500 - delay)
 end
 
 local markSpam = 0
