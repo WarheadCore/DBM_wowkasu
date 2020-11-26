@@ -10,14 +10,13 @@ mod:EnableModel()
 
 mod:RegisterEvents(
 	"SPELL_AURA_APPLIED",
-	"SPELL_CAST_SUCCESS"
+	"CHAT_MSG_RAID_BOSS_EMOTE"
 )
 
 local warnWebWrap		= mod:NewTargetAnnounce(28622, 2)
 local warnWebSpraySoon	= mod:NewSoonAnnounce(29484, 1)
 local warnWebSprayNow	= mod:NewSpellAnnounce(29484, 3)
 local warnSpidersSoon	= mod:NewAnnounce("WarningSpidersSoon", 2, 17332)
-local warnSpidersNow	= mod:NewAnnounce("WarningSpidersNow", 4, 17332)
 
 local timerWebSpray		= mod:NewCDTimer(40, 29484)
 local timerWebWrap		= mod:NewCDTimer(20, 28622)
@@ -27,7 +26,6 @@ function mod:OnCombatStart(delay)
 	warnWebSpraySoon:Schedule(35 - delay)
 	timerWebSpray:Start(40 - delay)
 	warnSpidersSoon:Schedule(25 - delay)
-	warnSpidersNow:Schedule(30 - delay)
 	timerSpider:Start(30 - delay)
 	timerWebWrap:Start(20 - delay)
 end
@@ -42,19 +40,26 @@ end
 
 function mod:SPELL_AURA_APPLIED(args)
 	if args:IsSpellID(28622) then -- Web Wrap
-		warnWebWrap:Show(args.destName)
-		timerWebWrap:Start(40)
+		warnWebWrap:Show(args.destName)		
 		if args.destName == UnitName("player") then
 			SendChatMessage(L.YellWebWrap, "YELL")
 		end
 	end
+end
 
-	if args:IsSpellID(29484, 54125) then -- Web Spray
+function mod:CHAT_MSG_RAID_BOSS_EMOTE(msg)
+	if msg == "%s разбрасывает нити паутины." then
 		warnWebSprayNow:Show()
 		warnWebSpraySoon:Schedule(35)
 		timerWebSpray:Start(40)
-		warnSpidersSoon:Schedule(25)
-		warnSpidersNow:Schedule(30)
-		timerSpider:Start(30)
+	end
+
+	if msg == "В паутине появляются паучата!" then
+		warnSpidersSoon:Schedule(35)
+		timerSpider:Start(40)
+	end
+
+	if msg == "%s свивает паутину в кокон!" then
+		timerWebWrap:Start(40)
 	end
 end
